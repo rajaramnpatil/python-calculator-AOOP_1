@@ -1,5 +1,5 @@
 # Advanced Python Calculator
-A professional command-line calculator built with Python using modular design, object-oriented programming (OOP), error handling, design patterns, pandas,input validation, logging, automated testing, and GitHub Actions.
+A professional command-line calculator built with Python using modular design, object-oriented programming (OOP), error handling, design patterns, pandas,input validation, logging, automated testing with 100% coverage, and GitHub Actions.
 
 ## Features
 
@@ -70,7 +70,7 @@ python-calculator-AOOP_1/
 ### 1. Clone the repository
 
 ```bash
-git clone <your-github-repository-url>
+git clone git@github.com:rajaramnpatil/python-calculator-AOOP_1.git
 cd python-calculator-AOOP_1
 ```
 
