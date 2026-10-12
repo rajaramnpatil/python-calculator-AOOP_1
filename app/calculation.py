@@ -13,7 +13,8 @@ logger = logging.getLogger("calculator")
 
 class CalculationObserver(Protocol):
     """Protocol for objects interested in successful calculations."""
-    def update(self, record: dict[str, Any]) -> None: ...
+    # This is only a type contract, so coverage should not expect it to run.
+    def update(self, record: dict[str, Any]) -> None: ...  # pragma: no branch
 
 
 class HistoryObserver:
