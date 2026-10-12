@@ -68,3 +68,16 @@ def test_auto_save_observer(tmp_path):
     calc = Calculator(CalculationHistory(tmp_path / "history.csv"), auto_save=True)
     calc.calculate("+", 1, 2)
     assert (tmp_path / "history.csv").exists()
+
+def test_calculator_empty_load_and_auto_saved_restore(tmp_path):
+    path = tmp_path / "history.csv"
+    calc = Calculator(CalculationHistory(path), auto_save=True)
+    # An empty load and each restored state take the alternate result/save branches.
+    assert calc.load() == 0
+    assert calc.last_result is None
+    calc.calculate("+", 2, 3)
+    assert calc.undo() is None
+    assert calc.redo() == 5
+    calc.clear()
+    assert calc.history.dataframe.empty
+    assert path.exists()

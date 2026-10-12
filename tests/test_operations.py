@@ -30,3 +30,43 @@ def test_factory_aliases_and_bad_input():
 
 def test_operation_is_abstract():
     with pytest.raises(TypeError): Operation()
+
+@pytest.mark.parametrize("error", [OverflowError, ZeroDivisionError, ValueError])
+def test_power_wraps_arithmetic_errors(error):
+    # A controlled numeric protocol object covers each exception without relying on huge values.
+    class RaisingPower:
+        def __pow__(self, _exponent):
+            raise error("failed power")
+
+    with pytest.raises(InvalidOperationError, match="Power operation is undefined"):
+        Power().calculate(RaisingPower(), 2)
+
+def test_power_rejects_infinite_result():
+    class InfinitePower:
+        def __pow__(self, _exponent):
+            return float("inf")
+
+    with pytest.raises(InvalidOperationError, match="result is not finite"):
+        Power().calculate(InfinitePower(), 2)
+
+@pytest.mark.parametrize("result", [complex(1, 1), float("inf")])
+def test_root_rejects_invalid_result(result):
+    # Simulate unsupported power results to cover both complex and non-finite rejection.
+    class UnusualRoot:
+        def __lt__(self, _other):
+            return False
+        def __pow__(self, _exponent):
+            return result
+
+    with pytest.raises(InvalidOperationError, match="not a finite real number"):
+        Root().calculate(UnusualRoot(), 2)
+
+def test_root_wraps_arithmetic_errors():
+    class RaisingRoot:
+        def __lt__(self, _other):
+            return False
+        def __pow__(self, _exponent):
+            raise ValueError("failed root")
+
+    with pytest.raises(InvalidOperationError, match="Root operation is undefined"):
+        Root().calculate(RaisingRoot(), 2)

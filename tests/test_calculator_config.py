@@ -36,3 +36,27 @@ def test_empty_log_path(monkeypatch):
     monkeypatch.setenv("CALCULATOR_LOG_FILE", " ")
     with pytest.raises(ConfigurationError):
         load_config(None)
+
+def test_load_config_from_dotenv(tmp_path, monkeypatch):
+    env_file = tmp_path / ".env"
+    env_file.write_text(
+        "CALCULATOR_HISTORY_FILE=from-env.csv\n"
+        "CALCULATOR_AUTO_SAVE=no\n"
+        "CALCULATOR_PRECISION=4\n"
+        "CALCULATOR_LOG_FILE=from-env.log\n",
+        encoding="utf-8",
+    )
+    # Remove inherited values so the test exercises dotenv loading itself.
+    for key in ("CALCULATOR_HISTORY_FILE", "CALCULATOR_AUTO_SAVE", "CALCULATOR_PRECISION", "CALCULATOR_LOG_FILE"):
+        monkeypatch.delenv(key, raising=False)
+    config = load_config(env_file)
+    assert config.history_file.name == "from-env.csv"
+    assert config.auto_save is False
+    assert config.precision == 4
+    assert config.log_file.name == "from-env.log"
+
+def test_non_integer_precision(monkeypatch):
+    # Exercise the int-conversion error separately from range validation.
+    monkeypatch.setenv("CALCULATOR_PRECISION", "not-an-integer")
+    with pytest.raises(ConfigurationError, match="must be an integer"):
+        load_config(None)

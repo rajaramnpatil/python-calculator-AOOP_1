@@ -43,6 +43,14 @@ def test_invalid_csv(tmp_path):
     path.write_text('"unfinished')
     with pytest.raises(HistoryError): CalculationHistory(path).load()
 
+def test_save_failure_is_wrapped(tmp_path):
+    # A file where the parent directory should be forces mkdir to raise OSError.
+    blocked_parent = tmp_path / "not-a-directory"
+    blocked_parent.write_text("file", encoding="utf-8")
+    history = CalculationHistory(blocked_parent / "history.csv")
+    with pytest.raises(HistoryError, match="Could not save history"):
+        history.save()
+
 def test_replace_records():
     history = CalculationHistory()
     history.replace_records([RECORD])
